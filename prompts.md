@@ -217,3 +217,47 @@ Hiển thị toàn bộ thông tin chi tiết của một nhân viên dựa vào
 
 ### 7. Sai sót của AI (nếu có):
 - Chưa phát hiện sai sót.
+
+
+---
+
+## Prompt 6 – Triển khai Trang Thêm nhân viên `EmployeeCreatePage` (`src/pages/EmployeeCreatePage.jsx`)
+
+### 1. Mục tiêu:
+Xây dựng trang thêm nhân viên mới tích hợp component `EmployeeForm`, khởi tạo giá trị với `EMPTY_EMPLOYEE`, gọi hàm `addEmployee` để thực hiện request POST lên crudcrud và xử lý điều hướng tới bản ghi mới hoặc hiển thị lỗi khi lưu thất bại.
+
+### 2. Phân tích trước khi code:
+- Lấy `addEmployee` từ `useEmployeeStore()`.
+- Dùng `useNavigate` để điều hướng.
+- Quản lý state cục bộ: `submitting` (đang lưu) và `error` (lỗi từ server/mạng).
+- Khi submit:
+  - Bật cờ `submitting = true`, xóa `error`.
+  - Gọi `await addEmployee(values)`.
+  - Thành công: điều hướng về `/employees/${created._id}`.
+  - Thất bại: trích xuất lỗi bằng `getErrorMessage(err)`, tắt `submitting`.
+  - Dữ liệu form được bảo toàn tự động vì state nội bộ nằm trong `EmployeeForm`.
+- Cung cấp liên kết "Hủy" điều hướng về trang chủ `/`.
+
+### 3. Prompt đã sử dụng:
+> Hãy triển khai component `src/pages/EmployeeCreatePage.jsx`:
+> 1. Tiêu đề Thêm nhân viên mới.
+> 2. Lấy hàm addEmployee từ useEmployeeStore().
+> 3. Sử dụng component EmployeeForm với initialValues={EMPTY_EMPLOYEE}, submitLabel='Lưu nhân viên'.
+> 4. Quản lý state submitting và error. Khi submit, gọi addEmployee(values). Thành công điều hướng về /employees/<_id mới>. Thất bại hiển thị lỗi trong role='alert', giữ nguyên dữ liệu form và phục hồi nút lưu.
+> 5. Có liên kết Hủy quay về /.
+
+### 4. Kết quả triển khai:
+- Hoàn thiện `src/pages/EmployeeCreatePage.jsx`.
+- Đáp ứng chuẩn giao diện Bootstrap và Accessibility (`role="alert"`).
+
+### 5. Kiểm thử:
+- Lệnh chạy:
+  - `npx vitest run -t "Trang thêm nhân viên"`
+  - `npx vitest run -t "hết hạn mức đúng lúc ghi"`
+- Kết quả: Vượt qua toàn bộ các ca kiểm thử: thêm nhân viên thành công chuyển tới trang chi tiết, xử lý trạng thái Đang lưu... (disabled), xử lý lỗi 500 và lỗi mất mạng/hết quota giữ nguyên dữ liệu trên form và cho phép submit lại.
+
+### 6. Đánh giá:
+- Tái sử dụng trọn vẹn `EmployeeForm` mã nền, luồng dữ liệu chuẩn xác.
+
+### 7. Sai sót của AI (nếu có):
+- Chưa phát hiện sai sót.
