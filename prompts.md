@@ -86,3 +86,39 @@ Xây dựng Custom Hook `useEmployees()` quản lý trạng thái tải danh sá
 
 ### 7. Sai sót của AI (nếu có):
 - Chưa phát hiện sai sót.
+
+
+---
+
+## Prompt 3 – Triển khai Custom Hook `useEmployee` (`src/hooks/useEmployee.js`)
+
+### 1. Mục tiêu:
+Xây dựng Custom Hook `useEmployee(id)` tìm kiếm thông tin một nhân viên theo `_id` từ Context Store (`useEmployeeStore`) mà không gửi thêm bất kỳ request nào lên server, đồng thời tính toán cờ `notFound` chuẩn xác.
+
+### 2. Phân tích trước khi code:
+- Không tạo thêm state nội bộ dư thừa (`useState`), mà tính toán trực tiếp từ `employees`, `loading`, `error` lấy từ `useEmployeeStore()`.
+- Tìm nhân viên: `employees.find(emp => emp._id === id) || null`.
+- Điều kiện `notFound`: `!loading && !error && !employee`.
+- Giá trị trả về: `{ employee, loading, error, notFound }`.
+
+### 3. Prompt đã sử dụng:
+> Hãy triển khai custom hook `src/hooks/useEmployee.js`:
+> 1. Nhận vào tham số `id` (chính là `_id` của nhân viên).
+> 2. Lấy `employees`, `loading`, `error` từ `useEmployeeStore()` (từ `src/context/EmployeesContext.jsx`), không gọi thêm API GET riêng.
+> 3. Tìm nhân viên có `_id === id` trong mảng `employees`.
+> 4. Xác định `notFound = true` khi danh sách đã tải xong (!loading), không có lỗi (!error) và không có nhân viên nào mang _id đó. Đang tải thì loading là true và notFound là false.
+> 5. Trả về đối tượng `{ employee, loading, error, notFound }`.
+
+### 4. Kết quả triển khai:
+- Hoàn thành `src/hooks/useEmployee.js`.
+- Không có request phụ nào được gửi khi truy xuất thông tin cá nhân.
+
+### 5. Kiểm thử:
+- Lệnh chạy: `npx vitest run -t "Hook useEmployees và useEmployee"`
+- Kết quả: Vượt qua test tìm nhân viên theo `_id` và xác thực cờ `notFound` với `id = "999"` sau khi tải xong. Tổng cộng 4/4 test của nhóm hook đều PASSED.
+
+### 6. Đánh giá:
+- Đảm bảo tính toán Derived State sạch sẽ, không vi phạm anti-pattern tạo state trùng lặp.
+
+### 7. Sai sót của AI (nếu có):
+- Chưa phát hiện sai sót.
