@@ -122,3 +122,54 @@ Xây dựng Custom Hook `useEmployee(id)` tìm kiếm thông tin một nhân vi�
 
 ### 7. Sai sót của AI (nếu có):
 - Chưa phát hiện sai sót.
+
+
+---
+
+## Prompt 4 – Triển khai Trang Danh sách `EmployeesPage` (`src/pages/EmployeesPage.jsx`)
+
+### 1. Mục tiêu:
+Xây dựng trang danh sách nhân viên kết hợp tìm kiếm theo họ tên/email, lọc theo phòng ban, phân trang và hiển thị thông báo flash khi có nhân viên bị xóa. Tất cả các thao tác lọc và phân trang thực hiện hoàn toàn ở Client trên dữ liệu đã tải và đồng bộ trực tiếp lên URL thông qua `useSearchParams`.
+
+### 2. Phân tích trước khi code:
+- Đọc query params: `q`, `department`, `page`, `deleted`.
+- Chuẩn hóa:
+  - `keyword = (qParam || "").trim().toLowerCase()`
+  - Lọc nhân viên: khớp `keyword` với `name` hoặc `email`, đồng thời khớp `department`.
+  - Phân trang: `total = filteredEmployees.length`, `totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))`.
+  - `currentPage` được giới hạn an toàn trong khoảng `[1, totalPages]`, nếu parse lỗi hoặc nhỏ hơn 1 thì đưa về 1.
+  - Cắt mảng: `paginatedEmployees = filteredEmployees.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)`.
+- Hàm `updateParams`:
+  - Reset về `page = 1` khi thay đổi `q` hoặc `department`.
+  - Tự động xóa tham số `deleted` khi tìm kiếm, đổi phòng ban hoặc chuyển trang.
+  - Omit param nếu rỗng hoặc nếu `page === 1`.
+- Trạng thái hiển thị:
+  - Đang tải: `spinner-border` + `Đang tải...`.
+  - Lỗi: `alert alert-danger` với `role="alert"` + Nút `Thử lại` gọi `reload()`.
+  - Không có kết quả: `alert alert-info` ("Không có nhân viên phù hợp.") và 2 nút phân trang disabled.
+  - Có dữ liệu: "Tổng cộng X nhân viên", `ul[aria-label="Danh sách nhân viên"]` render `li` với `key={emp._id}` bọc `EmployeeCard`, và `nav[aria-label="Phân trang"]`.
+
+### 3. Prompt đã sử dụng:
+> Hãy triển khai component `src/pages/EmployeesPage.jsx` theo đúng giao diện mẫu và yêu cầu đề bài:
+> 1. Lấy dữ liệu và hàm reload từ useEmployeeStore().
+> 2. Sử dụng useSearchParams để quản lý q, department, page, và deleted. Chuẩn hóa URL (không lưu param rỗng, page=1 không đưa lên URL, reset về page 1 khi search/filter, tự mất param deleted khi thao tác).
+> 3. Thực hiện lọc và phân trang hoàn toàn trên client từ mảng employees.
+> 4. Hiển thị đúng các trạng thái: Đang tải (spinner-border), Lỗi (alert alert-danger kèm nút Thử lại), Rỗng (Không có nhân viên phù hợp.), Danh sách nhân viên (ul với aria-label='Danh sách nhân viên', thẻ li mang key={_id} và bọc EmployeeCard), Thanh phân trang (nav với aria-label='Phân trang', ul.pagination).
+> 5. Hiển thị thông báo Đã xóa nhân viên <tên>. trong phần tử role='status' nếu có param deleted.
+
+### 4. Kết quả triển khai:
+- Hoàn thiện `src/pages/EmployeesPage.jsx`.
+- Đáp ứng 100% lớp CSS Bootstrap và các thuộc tính Accessibility bắt buộc (`aria-label`, `role="alert"`, `role="status"`).
+
+### 5. Kiểm thử:
+- Lệnh chạy:
+  - `npx vitest run -t "Trang danh sách"`
+  - `npx vitest run -t "vào ứng dụng chỉ gửi đúng một GET danh sách"`
+  - `npx vitest run -t "Lỗi mạng"`
+- Kết quả: Tất cả các bài test kiểm tra giao diện danh sách, phân trang, gõ tìm kiếm, đổi phòng ban, từ khóa toàn dấu cách, số trang trên URL không hợp lệ và nút Thử lại khi có lỗi đều PASSED hoàn hảo.
+
+### 6. Đánh giá:
+- Xử lý mượt mà trên Client, tiết kiệm tối đa quota 100 requests của crudcrud.
+
+### 7. Sai sót của AI (nếu có):
+- Chưa phát hiện sai sót.
