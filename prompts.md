@@ -261,3 +261,48 @@ Xây dựng trang thêm nhân viên mới tích hợp component `EmployeeForm`, 
 
 ### 7. Sai sót của AI (nếu có):
 - Chưa phát hiện sai sót.
+
+
+---
+
+## Prompt 7 – Triển khai Trang Sửa nhân viên `EmployeeEditPage` (`src/pages/EmployeeEditPage.jsx`)
+
+### 1. Mục tiêu:
+Xây dựng trang chỉnh sửa thông tin nhân viên, nạp dữ liệu cũ vào `EmployeeForm` với `submitLabel="Lưu thay đổi"`, kiểm tra dữ liệu thay đổi (dirty check) để tránh gửi PUT lãng phí, gửi PUT cập nhật bản ghi đầy đủ khi có thay đổi và điều hướng về trang chi tiết.
+
+### 2. Phân tích trước khi code:
+- Đọc `id` từ `useParams()`.
+- Lấy `{ employee, loading, error, notFound }` từ `useEmployee(id)` và `saveEmployee` từ `useEmployeeStore()`.
+- Xử lý các trạng thái: Đang tải (`spinner-border`), `notFound` (hiển thị "Không tìm thấy nhân viên <id>" trong thẻ `role="alert"`), `error` (thẻ `role="alert"`).
+- Khi submit:
+  - So sánh từng trường của form với bản ghi cũ.
+  - Nếu giống hệt nhau: hiển thị `"Chưa có thay đổi nào để lưu."` trong thẻ có `role="status"`, không gửi request.
+  - Nếu có thay đổi: ghép `{ ...employee, ...values }`, gọi `await saveEmployee(updatedRecord)`, thành công điều hướng về `/employees/${employee._id}`.
+  - Nếu thất bại: hiển thị thông báo lỗi trong `role="alert"`, giữ nguyên form.
+- Cung cấp liên kết "Hủy" điều hướng về trang chi tiết `/employees/${employee._id}`.
+
+### 3. Prompt đã sử dụng:
+> Hãy triển khai component `src/pages/EmployeeEditPage.jsx`:
+> 1. Lấy id từ useParams(), gọi useEmployee(id) và lấy saveEmployee từ useEmployeeStore().
+> 2. Tiêu đề Sửa nhân viên. Xử lý hiển thị nếu notFound hoặc đang tải.
+> 3. Đưa dữ liệu hiện tại vào EmployeeForm với submitLabel='Lưu thay đổi'.
+> 4. Khi submit: So sánh mọi trường giữa form và bản ghi cũ. Nếu giống hệt nhau, không gọi API mà hiển thị 'Chưa có thay đổi nào để lưu.' trong role='status'. Nếu có thay đổi, gọi saveEmployee với bản ghi cũ được ghi đè bởi form, thành công điều hướng về /employees/:id. Thất bại hiển thị lỗi trong role='alert' và giữ form.
+> 5. Có liên kết Hủy quay về /employees/:id.
+
+### 4. Kết quả triển khai:
+- Hoàn thiện `src/pages/EmployeeEditPage.jsx`.
+- Đáp ứng 100% tiêu chí đề bài và các lớp CSS Bootstrap theo `giao_dien_mau/form_sua.html` và `bang_trang_thai.html`.
+
+### 5. Kiểm thử:
+- Lệnh chạy: `npm test`
+- Kết quả: **30/30 tests PASSED** trọn vẹn toàn bộ bộ test tự chấm.
+  - Form có sẵn dữ liệu cũ của nhân viên.
+  - Bấm Lưu khi chưa sửa: hiện đúng "Chưa có thay đổi nào để lưu.", số lượng PUT là 0.
+  - Sửa và lưu: gửi đúng 1 PUT `/employees/:id` không có `_id` trong body, giữ nguyên trường `code` ban đầu, cập nhật UI chi tiết chính xác.
+  - Xử lý lỗi 500 khi lưu: nút Đang lưu... (disabled), hiện lỗi trong alert, giữ nguyên form.
+
+### 6. Đánh giá:
+- Hoàn tất toàn bộ yêu cầu kỹ thuật và nghiệp vụ của đề luyện tập số 06.
+
+### 7. Sai sót của AI (nếu có):
+- Chưa phát hiện sai sót.
