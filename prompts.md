@@ -39,3 +39,50 @@ Xây dựng lớp gọi API trung gian giao tiếp với máy chủ CRUD (crudcr
 
 ### 7. Sai sót của AI (nếu có):
 - Chưa phát hiện sai sót trong bước này. Code sinh ra chính xác cú pháp và pass toàn bộ test case kiểm tra mã lỗi cũng như định dạng payload.
+
+
+---
+
+## Prompt 2 – Triển khai Custom Hook `useEmployees` (`src/hooks/useEmployees.js`)
+
+### 1. Mục tiêu:
+Xây dựng Custom Hook `useEmployees()` quản lý trạng thái tải danh sách nhân viên từ API 1 lần duy nhất vào Context chung, xử lý hủy request bằng AbortController/Signal, cung cấp hàm `reload()` và các hàm cập nhật bất biến `addEmployee`, `saveEmployee`, `removeEmployee`.
+
+### 2. Phân tích trước khi code:
+- Sử dụng `useState` cho `employees` (mảng), `loading` (boolean, ban đầu `true`), `error` (chuỗi/null), và `reloadKey` (số đếm để kích hoạt effect reload).
+- Sử dụng `useEffect` có dependency `[reloadKey]`:
+  - Khởi tạo `new AbortController()`.
+  - Bắt lỗi: Nếu lỗi là `axios.isCancel(err)` hoặc `controller.signal.aborted` thì bỏ qua (không ghi vào state `error`).
+  - Lỗi mạng/server: ghi vào `error` qua `getErrorMessage(err)`.
+  - Cleanup function: gọi `controller.abort()`.
+- Các hàm mutate (`addEmployee`, `saveEmployee`, `removeEmployee`):
+  - Áp dụng cập nhật State bất biến:
+    - Thêm: `setEmployees(current => [...current, created])`
+    - Sửa: `setEmployees(current => current.map(item => item._id === updated._id ? updated : item))`
+    - Xóa: `setEmployees(current => current.filter(item => item._id !== id))`
+  - Không bọc `try/catch` để lỗi được ném ra cho component gọi xử lý.
+
+### 3. Prompt đã sử dụng:
+> Hãy triển khai custom hook `src/hooks/useEmployees.js`:
+> 1. Quản lý 3 state: `employees` (mặc định mảng rỗng), `loading` (mặc định true), `error` (mặc định null).
+> 2. Dùng `useEffect` gọi `getEmployees` 1 lần duy nhất khi mount với `AbortController`. Cleanup function phải gọi `abort()`. Xử lý để request bị hủy không ghi vào state và không báo lỗi kể cả khi bọc trong StrictMode.
+> 3. Cung cấp hàm `reload()` để tải lại (dùng cho nút Thử lại).
+> 4. Cung cấp 3 hàm ghi: `addEmployee(data)`, `saveEmployee(employee)`, `removeEmployee(id)` với cú pháp cập nhật `setEmployees(current => ...)` và để lỗi ném ra cho trang bắt.
+> 5. Hook trả về: `{ employees, loading, error, reload, addEmployee, saveEmployee, removeEmployee }`.
+
+### 4. Kết quả triển khai:
+- Hoàn thiện `src/hooks/useEmployees.js` với đầy đủ chú thích tiếng Việt.
+- Tích hợp an toàn với React 18 `StrictMode` và cơ chế hủy của Axios.
+
+### 5. Kiểm thử:
+- Lệnh chạy: `npx vitest run -t "useEmployees"`
+- Kết quả: 3/3 test dành riêng cho `useEmployees` vượt qua hoàn hảo:
+  1. Trạng thái khởi tạo là `loading`, sau đó nạp 12 nhân viên, không báo lỗi khi bọc StrictMode.
+  2. Tự động gọi `signal.aborted = true` khi unmount.
+  3. Bắt đúng lỗi 500 tiếng Việt và xóa lỗi, tải lại thành công khi bấm `reload()`.
+
+### 6. Đánh giá:
+- Đáp ứng chính xác yêu cầu đề bài và nguyên tắc Single Source of Truth cho State nhân viên.
+
+### 7. Sai sót của AI (nếu có):
+- Chưa phát hiện sai sót.
