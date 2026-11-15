@@ -173,3 +173,47 @@ Xây dựng trang danh sách nhân viên kết hợp tìm kiếm theo họ tên/
 
 ### 7. Sai sót của AI (nếu có):
 - Chưa phát hiện sai sót.
+
+
+---
+
+## Prompt 5 – Triển khai Trang Chi tiết và Xóa nhân viên `EmployeeDetailPage` (`src/pages/EmployeeDetailPage.jsx`)
+
+### 1. Mục tiêu:
+Hiển thị toàn bộ thông tin chi tiết của một nhân viên dựa vào `_id` lấy từ đường dẫn URL `/employees/:id` thông qua hook `useEmployee(id)`. Đồng thời cung cấp nút "Xóa nhân viên" thực hiện xóa bản ghi qua API, xử lý hiệu ứng loading khi xóa và điều hướng kèm thông báo thành công.
+
+### 2. Phân tích trước khi code:
+- Đọc tham số `id` từ `useParams()`.
+- Lấy `{ employee, loading, error, notFound }` từ `useEmployee(id)`.
+- Lấy `removeEmployee` từ `useEmployeeStore()`.
+- Trạng thái UI:
+  - Nếu `loading`: hiển thị `spinner-border` và chữ "Đang tải...".
+  - Nếu `notFound`: hiển thị thông báo "Không tìm thấy nhân viên <id>" trong thẻ có `role="alert"` và link quay lại danh sách.
+  - Nếu có `error`: hiển thị thông báo lỗi trong `role="alert"`.
+- Thao tác xóa:
+  - State cục bộ `deleting` và `deleteError`.
+  - Khi người dùng click "Xóa nhân viên", chuyển nút sang trạng thái `disabled` với nhãn "Đang xóa..." kèm spinner.
+  - Gọi `await removeEmployee(employee._id)`.
+  - Thành công: `navigate('/?deleted=' + encodeURIComponent(employee.name))`.
+  - Thất bại: ghi nhận lỗi từ `getErrorMessage(err)` vào `deleteError`, phục hồi nút bấm.
+
+### 3. Prompt đã sử dụng:
+> Hãy triển khai component `src/pages/EmployeeDetailPage.jsx`:
+> 1. Lấy id từ useParams(), gọi useEmployee(id) và lấy removeEmployee từ useEmployeeStore().
+> 2. Xử lý các trạng thái: Đang tải (Đang tải...), notFound (hiển thị 'Không tìm thấy nhân viên <id>' trong role='alert'), Lỗi khác (hiển thị thông báo trong role='alert').
+> 3. Khi có dữ liệu: Hiển thị đầy đủ thông tin (họ tên, StatusBadge, chức danh, phòng ban, email, lương VND bằng formatVnd, thành phố, ngày vào làm bằng formatDate), link Sửa (/employees/:id/edit), link Quay lại danh sách (/), nút Xóa (btn btn-danger).
+> 4. Nút Xóa nhân viên: khi click gọi removeEmployee(id). Trong lúc chờ, nút hiện 'Đang xóa...' và bị vô hiệu hóa. Nếu thành công, điều hướng về /?deleted=${encodeURIComponent(name)}. Nếu thất bại, ở lại trang, hiện lỗi trong role='alert' và phục hồi nút Xóa dùng lại được.
+
+### 4. Kết quả triển khai:
+- Hoàn thiện `src/pages/EmployeeDetailPage.jsx`.
+- Sử dụng đầy đủ các component mã nền `StatusBadge` và các hàm tiện ích `formatVnd`, `formatDate`.
+
+### 5. Kiểm thử:
+- Lệnh chạy: `npx vitest run -t "Trang chi tiết và xóa nhân viên"`
+- Kết quả: Vượt qua toàn bộ các ca kiểm thử dành cho trang chi tiết và nút xóa (hiển thị dữ liệu, định dạng tiền tệ, ngày tháng, trạng thái xóa, hủy xóa khi server lỗi 500 và điều hướng thành công).
+
+### 6. Đánh giá:
+- Đảm bảo tính nhất quán của giao diện và luồng xử lý bất đồng bộ an toàn.
+
+### 7. Sai sót của AI (nếu có):
+- Chưa phát hiện sai sót.
