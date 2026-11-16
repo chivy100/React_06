@@ -1,7 +1,7 @@
 // ===== BÀI LÀM: dán endpoint crudcrud của bạn vào API_BASE =====
 // Endpoint crudcrud của BẠN: mở https://crudcrud.com, sao chép địa chỉ (dạng https://crudcrud.com/api/<32 ký tự>),
 // dán thay cho giá trị mẫu bên dưới (không có dấu / ở cuối), rồi chạy `npm run seed` đúng một lần.
-export const API_BASE = "https://crudcrud.com/api/00000000000000000000000000000000";
+export const API_BASE = "https://crudcrud.com/api/682ebb6243334e66817a00163e021d53";
 
 // ===== Mã nền (có sẵn, KHÔNG sửa) =====
 // Hằng số dùng chung của ứng dụng quản lý nhân viên.
